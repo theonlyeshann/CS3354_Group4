@@ -1,6 +1,6 @@
 // Load environment variables
 const { loadEnvFile } = require('node:process');
-loadEnvFile();
+loadEnvFile('keysync/server/.env');
 
 let mysql = require('mysql2');
 
