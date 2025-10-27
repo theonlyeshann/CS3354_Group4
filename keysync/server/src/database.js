@@ -1,6 +1,6 @@
 // Load environment variables
 const { loadEnvFile } = require('node:process');
-loadEnvFile('keysync/server/.env');
+loadEnvFile('.../server/.env');
 
 let mysql = require('mysql2');
 
@@ -12,7 +12,7 @@ let con = mysql.createConnection({
 
 con.connect(function(err) {
   if (err) throw err;
-  console.log("Successfully connected to DB server");
+  console.log("Successfully connected to DB");
   con.query("CREATE DATABASE IF NOT EXISTS keysync", function (err) {
     if (err) throw err;
   });
