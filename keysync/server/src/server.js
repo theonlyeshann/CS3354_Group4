@@ -4,13 +4,14 @@ loadEnvFile('server/.env');
 
 const express = require('express');
 const app = express();
-const port = process.env.PORT;
 const login = require('./login_router');
 
-app.use('/', login)
+app.use(express.urlencoded({ extended: true }));
+
+app.use('/', login);
 
 // Start the server
-app.listen(port, () => {
-  console.log(`Example app listening at http://localhost:${port}`);
+app.listen(process.env.PORT, () => {
+  console.log(`Example app listening at http://localhost:${process.env.PORT}`);
 }); 
 
