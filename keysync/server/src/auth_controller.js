@@ -14,6 +14,7 @@ function loginUser(req, res, next) {
     }
     else if (results[0].Password == pw) {
       console.log("Successful login");
+      res.redirect("/");
     }
     else  {
       console.log("Incorrect password");
