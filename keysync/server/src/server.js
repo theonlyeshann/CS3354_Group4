@@ -4,11 +4,11 @@ loadEnvFile('server/.env');
 
 const express = require('express');
 const app = express();
-const login = require('./login_router');
+const auth = require('./auth_router');
 
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/', login);
+app.use('/', auth.router);
 
 // Start the server
 app.listen(process.env.PORT, () => {

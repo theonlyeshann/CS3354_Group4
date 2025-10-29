@@ -1,10 +1,10 @@
 // Load environment variables
 const { loadEnvFile } = require('node:process');
-loadEnvFile('.../server/.env');
+loadEnvFile('server/.env');
 
-let mysql = require('mysql2');
+const mysql = require('mysql2');
 
-let con = mysql.createConnection({
+const con = mysql.createConnection({
   host: process.env.HOST,
   user: process.env.USER,
   password: process.env.PASSWORD
@@ -13,7 +13,11 @@ let con = mysql.createConnection({
 con.connect(function(err) {
   if (err) throw err;
   console.log("Successfully connected to DB");
-  con.query("CREATE DATABASE IF NOT EXISTS keysync", function (err) {
-    if (err) throw err;
-  });
+  con.query(`CREATE DATABASE IF NOT EXISTS ${process.env.DB_NAME}`);
+  con.query(`USE ${process.env.DB_NAME}`);
+  con.query(`CREATE TABLE IF NOT EXISTS ${process.env.LOGIN_TABLE_NAME} (Username varchar(20) UNIQUE, Password varchar(20));`);
 });
+
+module.exports = {
+  con
+}
