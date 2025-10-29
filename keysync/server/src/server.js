@@ -8,7 +8,7 @@ const auth = require('./auth_router');
 
 app.use(express.urlencoded({ extended: true }));
 
-app.use('/', auth.router);
+app.use('/login', auth.router);
 
 // Start the server
 app.listen(process.env.PORT, () => {
