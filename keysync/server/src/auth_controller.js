@@ -1,6 +1,6 @@
 // Load environment variables
 const { loadEnvFile } = require('node:process');
-loadEnvFile('server/.env');
+loadEnvFile('./keysync/server/.env');
 
 db = require('./database.js');
 
