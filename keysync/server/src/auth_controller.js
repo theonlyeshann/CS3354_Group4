@@ -8,7 +8,9 @@ function loginUser(req, res) {
   user = req.body.username;
   pw = req.body.password;
 
-  db.con.query(`SELECT Username, Password FROM ${process.env.LOGIN_TABLE_NAME} WHERE Username = '${user}'`, (err, results) => {
+  db.pool.getConnection(function(err, con) {
+    if (err) throw err;
+    con.query(`SELECT Username, Password FROM ${process.env.LOGIN_TABLE_NAME} WHERE Username = '${user}'`, (err, results) => {
     if (err)  {
       res.status(500).send(`Error encountered whilst looking for user: ${err}`);
     }
@@ -21,6 +23,8 @@ function loginUser(req, res) {
     else  {
       res.status(400).send("Incorrect password");
     }
+    });
+    con.release();
   });
 }
 
