@@ -4,20 +4,22 @@ loadEnvFile('./keysync/server/.env');
 
 db = require('./database.js');
 
-function loginUser(req, res, next) {
+function loginUser(req, res) {
   user = req.body.username;
   pw = req.body.password;
 
   db.con.query(`SELECT Username, Password FROM ${process.env.LOGIN_TABLE_NAME} WHERE Username = '${user}'`, (err, results) => {
     if (err)  {
-      console.log("Could not find username");
+      res.status(500).send("Error encountered whilst looking for user");
+    }
+    else if (results.length == 0) {
+      res.status(404).send("Could not find username");
     }
     else if (results[0].Password == pw) {
-      console.log("Successful login");
       res.redirect("/");
     }
     else  {
-      console.log("Incorrect password");
+      res.status(400).send("Incorrect password");
     }
   });
 }
