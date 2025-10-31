@@ -2,10 +2,15 @@
 const { loadEnvFile } = require('node:process');
 loadEnvFile('./keysync/server/.env');
 
+const cors = require('cors');
 const express = require('express');
 const app = express();
-const auth = require('./auth_router');
 
+const auth = require('./auth_router');
+const main = require('./main_router');
+
+app.use(cors());
+app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use('/login', auth.router);
