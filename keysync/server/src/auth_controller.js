@@ -19,14 +19,15 @@ function loginUser(req, res) {
       }
       else if (results[0].Password == pw) {
         req.session.userId = results[0].UserID;
-        req.session.save(function() {
-          if (!req.session.userId)  {
-            console.log("Login could not be stored in session storage");
-          }
-          else  {
-            res.redirect("/main"); 
-          }
-        });
+        // req.session.save(function() {
+        //   if (!req.session.userId)  {
+        //     console.log("Login could not be stored in session storage");
+        //   }
+        //   else  {
+        //     res.redirect("/main"); 
+        //   }
+        // });
+        res.redirect("/main"); 
       }
       else  {
         res.status(400).send("Incorrect password");

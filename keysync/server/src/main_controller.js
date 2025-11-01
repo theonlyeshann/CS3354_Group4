@@ -4,12 +4,17 @@ loadEnvFile('./keysync/server/.env');
 
 db = require('./database.js');
 
-function addPassword(req, res) {
+function verifyLoginSession(req, res, next) {
   console.log(req.session);
   if (!req.session.userId) {
     return res.status(401).send('Unauthorized');
   }
-  
+  else  {
+    next();
+  }
+}
+
+function addPassword(req, res) {  
   let site = req.body.site;
   let user = req.body.username;
   let pw = req.body.password;
