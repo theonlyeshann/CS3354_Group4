@@ -56,7 +56,7 @@ export default function Dashboard({onLoginSuccess}) {
 
     try {
       const response = await fetch('http://localhost:8080/main/delete', {
-        method: 'POST',
+        method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
         },
