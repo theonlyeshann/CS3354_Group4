@@ -11,6 +11,7 @@ function verifyLoginSession(req, res, next) {
   }
 }
 
+router.get('/', verifyLoginSession, main_controller.retrievePasswords);
 router.post('/add', verifyLoginSession, main_controller.addPassword);
 
 module.exports = {

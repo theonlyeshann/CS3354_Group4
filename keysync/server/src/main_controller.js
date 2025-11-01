@@ -4,14 +4,23 @@ loadEnvFile('./keysync/server/.env');
 
 db = require('./database.js');
 
-function verifyLoginSession(req, res, next) {
-  console.log(req.session);
-  if (!req.session.userId) {
-    return res.status(401).send('Unauthorized');
-  }
-  else  {
-    next();
-  }
+function retrievePasswords(req, res) {  
+  db.pool.getConnection(function(err, con) {
+    if (err) throw err;
+    con.query(`SELECT Site, Username, Password FROM ${process.env.PASSWORD_TABLE_NAME} WHERE UserID = ${req.session.userId}`, (err, results) => {
+    if (err)  {
+      res.status(500).send(`Error encountered whilst querying database: ${err}`);
+    }
+    else if (results.length == 0) {
+      res.status(404).send(`Database is empty`);
+    }
+    else  {
+      console.log(results);
+      res.status(200).send("Successfully retrieved database");
+    }
+    });
+    con.release();
+  });
 }
 
 function addPassword(req, res) {  
@@ -21,7 +30,7 @@ function addPassword(req, res) {
 
   db.pool.getConnection(function(err, con) {
     if (err) throw err;
-    con.query(`INSERT INTO ${process.env.PASSWORD_TABLE_NAME} (Site, Username, Password) VALUES ('${site}', '${user}', '${pw}')`, (err, results) => {
+    con.query(`INSERT INTO ${process.env.PASSWORD_TABLE_NAME} VALUES (${req.session.userId}, '${site}', '${user}', '${pw}')`, (err, results) => {
     if (err)  {
       res.status(500).send(`Error encountered whilst adding user: ${err}`);
     }
@@ -34,5 +43,6 @@ function addPassword(req, res) {
 }
 
 module.exports = {
+  retrievePasswords,
   addPassword
 }
