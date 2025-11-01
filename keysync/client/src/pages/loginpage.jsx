@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import '../styles/loginpage.css';
+import { useNavigate } from 'react-router-dom';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
@@ -7,6 +8,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
+  // const navigate = useNavigate();
 
   const handleLogin = async () => {
     if (!username || !password) {
@@ -36,6 +38,8 @@ export default function LoginPage() {
         setMessage(data.message || 'Login successful!');
         setMessageType('success');
         
+        // setTimeout(() => { navigate('/dashboard'); }, 1000);
+
         if (data.token) {
           console.log('Auth token received:', data.token);
         }
