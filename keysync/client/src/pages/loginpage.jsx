@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import '../styles/loginpage.css';
 
-export default function LoginPage() {
+export default function LoginPage({onLoginSuccess}) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -24,6 +24,7 @@ export default function LoginPage() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({
           username: username,
           password: password
@@ -32,7 +33,8 @@ export default function LoginPage() {
 
       const data = await response;
 
-      if (response.status == 302) {
+      if (response.status == 200) {
+        onLoginSuccess();
         setMessage(data.message || 'Login successful!');
         setMessageType('success');
         

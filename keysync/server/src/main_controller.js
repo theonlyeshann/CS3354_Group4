@@ -61,8 +61,21 @@ function deletePassword(req, res) {
   });
 }
 
+function logOut(req, res) {  
+  req.session.destroy((err) =>  {
+    if (err)  {
+      res.status(500).send(`Error encountered whilst logging out: ${err}`);
+    }
+    else  {
+      res.clearCookie('connect.sid');
+      res.status(200).send("Successfully logged out");
+    }
+  });
+}
+
 module.exports = {
   retrievePasswords,
   addPassword,
-  deletePassword
+  deletePassword,
+  logOut
 }

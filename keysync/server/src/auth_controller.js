@@ -19,7 +19,7 @@ function loginUser(req, res) {
       }
       else if (results[0].Password == pw) {
         req.session.userId = results[0].UserID;
-        res.redirect("/main"); 
+        res.status(200).send("Successful login");
       }
       else  {
         res.status(400).send("Incorrect password");
