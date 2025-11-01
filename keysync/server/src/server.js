@@ -11,9 +11,14 @@ const auth = require('./auth_router');
 const main = require('./main_router');
 
 app.use(session({
-  secret: 'test'
+  secret: 'test',
+  resave: false,
+  saveUninitialized: true
 }));
-app.use(cors());
+app.use(cors({
+  credentials: true,
+  origin: "http://localhost:3000"
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
