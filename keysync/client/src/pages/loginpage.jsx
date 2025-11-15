@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import '../styles/loginpage.css';
 
-export default function LoginPage({onLoginSuccess}) {
+export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -34,7 +34,7 @@ export default function LoginPage({onLoginSuccess}) {
       const data = await response;
 
       if (response.status == 200) {
-        onLoginSuccess();
+        window.location.href = '/dashboard'
         setMessage(data.message || 'Login successful!');
         setMessageType('success');
         
