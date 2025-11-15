@@ -1,0 +1,51 @@
+.lp-container {
+    flex-grow: 1;
+    min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  /* background moved from inline styles so page-wide gradient stays consistent */
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* Responsive card that scales smoothly between phone and large laptop screens */
+.lp-card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  padding: clamp(1.25rem, 2.5vw, 3rem);            /* responsive padding */
+  width: clamp(320px, 42vw, 760px);                /* min:320px, fluid:42vw, max:760px */
+  margin: 0 auto;
+}
+
+#root {
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Make form controls stretch to card width and stay readable */
+.lp-card input,
+.lp-card button,
+.lp-card textarea,
+.lp-card select {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Slightly larger card padding and font on larger screens */
+@media screen and (min-width: 1024px) {
+  .lp-card {
+    padding: clamp(2rem, 2.5vw, 4rem);
+  }
+}
+
+/* Optional tweaks for very small screens */
+@media screen and (max-width: 400px) {
+  .lp-card {
+    padding: 1rem;
+    width: 92%;
+  }
+}
