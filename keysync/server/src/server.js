@@ -13,7 +13,8 @@ const main = require('./main_router');
 app.use(session({
   secret: 'test',
   resave: false,
-  saveUninitialized: true
+  saveUninitialized: true,
+  sameSite: 'none'
 }));
 app.use(cors({
   credentials: true,

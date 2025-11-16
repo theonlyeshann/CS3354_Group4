@@ -3,27 +3,6 @@ import '../styles/dashboard.css';
 
 export default function Dashboard() {
   const [passwords, setPasswords] = useState([
-    {
-      id: 1,
-      websiteName: 'Website Name',
-      password: '******************',
-      lastChanged: 'MM/DD/YYYY',
-      status: 'Secure'
-    },
-    {
-      id: 2,
-      websiteName: 'Website Name',
-      password: '******************',
-      lastChanged: 'MM/DD/YYYY',
-      status: 'Breach Detected'
-    },
-    {
-      id: 3,
-      websiteName: 'Website Name',
-      password: '******************',
-      lastChanged: 'MM/DD/YYYY',
-      status: 'Secure'
-    }
   ]);
 
   const [showAddModal, setShowAddModal] = useState(false);
@@ -49,8 +28,8 @@ export default function Dashboard() {
     window.location.href = '/';
   };
 
-  const handleAddPassword = () => {
-    if (newPassword.websiteUrl && newPassword.username && newPassword.password) {
+  const handleAddPassword = async() => {
+    try {
       const newEntry = {
         id: Date.now(),
         websiteName: newPassword.websiteUrl,
@@ -58,9 +37,28 @@ export default function Dashboard() {
         lastChanged: new Date().toLocaleDateString('en-US'),
         status: 'Secure'
       };
-      setPasswords([...passwords, newEntry]);
-      setNewPassword({ websiteUrl: '', username: '', password: '' });
-      setShowAddModal(false);
+      
+      const response = await fetch('http://localhost:8080/main/add', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          site: newPassword.websiteUrl,
+          username: newPassword.username,
+          password: newPassword.password
+        })
+      });
+      
+      if (response.status == 200) {
+        setPasswords([...passwords, newEntry]);
+        setNewPassword({ websiteUrl: '', username: '', password: '' });
+        setShowAddModal(false);
+      }
+
+    } catch (error) {
+      console.error('Error:', error);
     }
   };
 
@@ -69,10 +67,31 @@ export default function Dashboard() {
     setShowDeleteModal(true);
   };
 
-  const confirmDelete = () => {
-    setPasswords(passwords.filter(p => p.id !== selectedPassword));
-    setShowDeleteModal(false);
-    setSelectedPassword(null);
+  const confirmDelete = async() => {
+    try {
+      const passwordToDelete = passwords.filter(p => p.id == selectedPassword);
+      
+      const response = await fetch('http://localhost:8080/main/delete', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          site: passwordToDelete[0].websiteName,
+          username: passwordToDelete[0].username,
+          password: passwordToDelete[0].password
+        })
+      });
+      
+      if (response.status == 200) {
+        setPasswords(passwords.filter(p => p.id !== selectedPassword));
+        setShowDeleteModal(false);
+      }
+
+    } catch (error) {
+      console.error('Error:', error);
+    };
   };
 
   const handleEditPassword = (password) => {
@@ -85,20 +104,41 @@ export default function Dashboard() {
     setShowEditModal(true);
   };
 
-  const saveEditPassword = () => {
-    setPasswords(passwords.map(p => {
-      if (p.id === selectedPassword) {
-        return {
-          ...p,
-          websiteName: editPassword.websiteUrl || p.websiteName,
-          password: editPassword.password ? '*'.repeat(editPassword.password.length) : p.password,
-          lastChanged: new Date().toLocaleDateString('en-US')
-        };
+  const saveEditPassword = async() => {
+    try {
+
+      const response = await fetch('http://localhost:8080/main/edit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          site: editPassword.websiteUrl,
+          username: editPassword.username,
+          password: editPassword.password
+        })
+      });
+      
+      if (response.status == 200) {
+        setPasswords(passwords.map(p => {
+          if (p.id === selectedPassword) {
+            return {
+              ...p,
+              websiteName: editPassword.websiteUrl || p.websiteName,
+              password: editPassword.password ? '*'.repeat(editPassword.password.length) : p.password,
+              lastChanged: new Date().toLocaleDateString('en-US')
+            };
+          }
+          return p;
+        }));
+        setShowEditModal(false);
+        setEditPassword({ websiteUrl: '', username: '', password: '' });
       }
-      return p;
-    }));
-    setShowEditModal(false);
-    setEditPassword({ websiteUrl: '', username: '', password: '' });
+
+    } catch (error) {
+      console.error('Error:', error);
+    };
   };
 
   return (

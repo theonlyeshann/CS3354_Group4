@@ -13,6 +13,7 @@ function verifyLoginSession(req, res, next) {
 
 router.get('/', verifyLoginSession, main_controller.retrievePasswords);
 router.post('/add', verifyLoginSession, main_controller.addPassword);
+router.post('/edit', verifyLoginSession, main_controller.editPassword);
 router.delete('/delete', verifyLoginSession, main_controller.deletePassword);
 router.post('/logout', main_controller.logOut);
 

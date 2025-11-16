@@ -34,7 +34,7 @@ export default function LoginPage() {
       const data = await response;
 
       if (response.status == 200) {
-        window.location.href = '/dashboard'
+        window.location.href = '/main'
         setMessage(data.message || 'Login successful!');
         setMessageType('success');
         
