@@ -15,7 +15,6 @@ function retrievePasswords(req, res) {
       res.status(404).send(`Database is empty`);
     }
     else  {
-      console.log(results);
       res.status(200).send("Successfully retrieved database");
     }
     });
@@ -36,6 +35,25 @@ function addPassword(req, res) {
     }
     else  {
       res.status(200).send("Successfully added password");
+    }
+    });
+    con.release();
+  });
+}
+
+function editPassword(req, res) {  
+  let site = req.body.site;
+  let user = req.body.username;
+  let pw = req.body.password;
+
+  db.pool.getConnection(function(err, con) {
+    if (err) throw err;
+    con.query(`UPDATE ${process.env.PASSWORD_TABLE_NAME} SET Site = '${site}', Username = '${user}', Password = '${pw}' WHERE UserID = ${req.session.userId}`, (err, results) => {
+    if (err)  {
+      res.status(500).send(`Error encountered whilst editing user: ${err}`);
+    }
+    else  {
+      res.status(200).send("Successfully edited password");
     }
     });
     con.release();
@@ -76,6 +94,7 @@ function logOut(req, res) {
 module.exports = {
   retrievePasswords,
   addPassword,
+  editPassword,
   deletePassword,
   logOut
 }
