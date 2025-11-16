@@ -33,7 +33,8 @@ export default function Dashboard() {
       const newEntry = {
         id: Date.now(),
         websiteName: newPassword.websiteUrl,
-        password: '*'.repeat(newPassword.password.length),
+        username: newPassword.username,
+        password: newPassword.password,
         lastChanged: new Date().toLocaleDateString('en-US'),
         status: 'Secure'
       };
@@ -70,6 +71,7 @@ export default function Dashboard() {
   const confirmDelete = async() => {
     try {
       const passwordToDelete = passwords.filter(p => p.id == selectedPassword);
+      console.log(passwordToDelete);
       
       const response = await fetch('http://localhost:8080/main/delete', {
         method: 'DELETE',
@@ -185,7 +187,7 @@ export default function Dashboard() {
               <div key={password.id} className="password-card">
                 <div className="password-info">
                   <h3 className="website-name">{password.websiteName}</h3>
-                  <p className="password-text">Password: {password.password}</p>
+                  <p className="password-text">Password: {'*'.repeat(password.password.length)}</p>
                   <p className="last-changed">Last Changed: {password.lastChanged}</p>
                   <p className={`status ${password.status === 'Breach Detected' ? 'breach' : 'secure'}`}>
                     Status: {password.status}

@@ -1,5 +1,6 @@
 // Load environment variables
 const { loadEnvFile } = require('node:process');
+const crypto = require('crypto');
 loadEnvFile('./keysync/server/.env');
 
 db = require('./database.js');
@@ -23,9 +24,9 @@ function retrievePasswords(req, res) {
 }
 
 function addPassword(req, res) {  
-  let site = req.body.site;
-  let user = req.body.username;
-  let pw = req.body.password;
+  let site = crypto.createHash('sha256').update(req.body.site).digest('hex');
+  let user = crypto.createHash('sha256').update(req.body.username).digest('hex');
+  let pw = crypto.createHash('sha256').update(req.body.password).digest('hex');
 
   db.pool.getConnection(function(err, con) {
     if (err) throw err;
@@ -42,9 +43,9 @@ function addPassword(req, res) {
 }
 
 function editPassword(req, res) {  
-  let site = req.body.site;
-  let user = req.body.username;
-  let pw = req.body.password;
+  let site = crypto.createHash('sha256').update(req.body.site).digest('hex');
+  let user = crypto.createHash('sha256').update(req.body.username).digest('hex');
+  let pw = crypto.createHash('sha256').update(req.body.password).digest('hex');
 
   db.pool.getConnection(function(err, con) {
     if (err) throw err;
@@ -61,9 +62,9 @@ function editPassword(req, res) {
 }
 
 function deletePassword(req, res) {  
-  let site = req.body.site;
-  let user = req.body.username;
-  let pw = req.body.password;
+  let site = crypto.createHash('sha256').update(req.body.site).digest('hex');
+  let user = crypto.createHash('sha256').update(req.body.username).digest('hex');
+  let pw = crypto.createHash('sha256').update(req.body.password).digest('hex');
 
   db.pool.getConnection(function(err, con) {
     if (err) throw err;
