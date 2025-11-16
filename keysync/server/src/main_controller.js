@@ -15,7 +15,6 @@ function retrievePasswords(req, res) {
       res.status(404).send(`Database is empty`);
     }
     else  {
-      console.log(results);
       res.status(200).send("Successfully retrieved database");
     }
     });
