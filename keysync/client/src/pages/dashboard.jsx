@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { v4 as uuidv4 } from 'uuid';
 import '../styles/dashboard.css';
 
 export default function Dashboard() {
@@ -23,6 +24,44 @@ export default function Dashboard() {
     password: ''
   });
 
+  const retrievePasswordsFromDatabase = async() =>  {
+    try {      
+      setPasswords([...[]]);
+      const response = await fetch('http://localhost:8080/main/', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include'
+      });
+      
+      if (response.status == 200) {
+        let existingPasswords = await response.json();
+        console.log(`Existing passwords - ${existingPasswords}`);
+        const formattedExistingPasswords = existingPasswords.map((password) =>  ({
+          id: uuidv4(),
+          websiteName: password.Site,
+          username: password.Username,
+          password: password.Password,
+          lastChanged: new Date().toLocaleDateString('en-US'),
+          status: 'Secure'
+        }));
+        setPasswords([...formattedExistingPasswords]);
+      }
+
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
+  useEffect(() => {
+    retrievePasswordsFromDatabase();
+  }, []);
+
+  useEffect(() => {
+    console.log(passwords);
+  }, [passwords]);
+
   const handleLogout = () => {
     // Redirect to login page
     window.location.href = '/';
@@ -31,7 +70,7 @@ export default function Dashboard() {
   const handleAddPassword = async() => {
     try {
       const newEntry = {
-        id: Date.now(),
+        id: uuidv4(),
         websiteName: newPassword.websiteUrl,
         username: newPassword.username,
         password: newPassword.password,
@@ -71,7 +110,6 @@ export default function Dashboard() {
   const confirmDelete = async() => {
     try {
       const passwordToDelete = passwords.filter(p => p.id == selectedPassword);
-      console.log(passwordToDelete);
       
       const response = await fetch('http://localhost:8080/main/delete', {
         method: 'DELETE',
@@ -124,11 +162,12 @@ export default function Dashboard() {
       
       if (response.status == 200) {
         setPasswords(passwords.map(p => {
-          if (p.id === selectedPassword) {
+          if (p.id == selectedPassword) {
             return {
               ...p,
               websiteName: editPassword.websiteUrl || p.websiteName,
-              password: editPassword.password ? '*'.repeat(editPassword.password.length) : p.password,
+              username: editPassword.username,
+              password: editPassword.password ? editPassword.password : p.password,
               lastChanged: new Date().toLocaleDateString('en-US')
             };
           }
@@ -183,11 +222,11 @@ export default function Dashboard() {
           </div>
 
           <div className="passwords-list">
-            {passwords.map((password) => (
+            {passwords.length > 0 && (passwords.map((password) => (
               <div key={password.id} className="password-card">
                 <div className="password-info">
                   <h3 className="website-name">{password.websiteName}</h3>
-                  <p className="password-text">Password: {'*'.repeat(password.password.length)}</p>
+                  <p className="password-text">Password: {'*'.repeat(20)}</p>
                   <p className="last-changed">Last Changed: {password.lastChanged}</p>
                   <p className={`status ${password.status === 'Breach Detected' ? 'breach' : 'secure'}`}>
                     Status: {password.status}
@@ -202,7 +241,7 @@ export default function Dashboard() {
                   </button>
                 </div>
               </div>
-            ))}
+            )))}
           </div>
         </div>
 
