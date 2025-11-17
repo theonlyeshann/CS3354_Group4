@@ -1,5 +1,6 @@
 // Load environment variables
 const { loadEnvFile } = require('node:process');
+const crypto = require('crypto');
 loadEnvFile('./keysync/server/.env');
 
 db = require('./database.js');
@@ -11,11 +12,8 @@ function retrievePasswords(req, res) {
     if (err)  {
       res.status(500).send(`Error encountered whilst querying database: ${err}`);
     }
-    else if (results.length == 0) {
-      res.status(404).send(`Database is empty`);
-    }
     else  {
-      res.status(200).send("Successfully retrieved database");
+      res.status(200).json(results);
     }
     });
     con.release();
@@ -25,7 +23,7 @@ function retrievePasswords(req, res) {
 function addPassword(req, res) {  
   let site = req.body.site;
   let user = req.body.username;
-  let pw = req.body.password;
+  let pw = crypto.createHash('sha256').update(req.body.password).digest('hex');
 
   db.pool.getConnection(function(err, con) {
     if (err) throw err;
@@ -44,11 +42,11 @@ function addPassword(req, res) {
 function editPassword(req, res) {  
   let site = req.body.site;
   let user = req.body.username;
-  let pw = req.body.password;
+  let pw = crypto.createHash('sha256').update(req.body.password).digest('hex');
 
   db.pool.getConnection(function(err, con) {
     if (err) throw err;
-    con.query(`UPDATE ${process.env.PASSWORD_TABLE_NAME} SET Site = '${site}', Username = '${user}', Password = '${pw}' WHERE UserID = ${req.session.userId}`, (err, results) => {
+    con.query(`UPDATE ${process.env.PASSWORD_TABLE_NAME} SET Username = '${user}', Password = '${pw}' WHERE UserID = ${req.session.userId} AND Site = '${site}'`, (err, results) => {
     if (err)  {
       res.status(500).send(`Error encountered whilst editing user: ${err}`);
     }
@@ -63,7 +61,7 @@ function editPassword(req, res) {
 function deletePassword(req, res) {  
   let site = req.body.site;
   let user = req.body.username;
-  let pw = req.body.password;
+  let pw = req.body.password.length == 64? req.body.password : crypto.createHash('sha256').update(req.body.password).digest('hex');
 
   db.pool.getConnection(function(err, con) {
     if (err) throw err;

@@ -17,11 +17,9 @@ pool.getConnection(function(err, con) {
   console.log("Successfully connected to DB");
   con.query(`CREATE DATABASE IF NOT EXISTS ${process.env.DB_NAME}`);
   con.query(`USE ${process.env.DB_NAME}`);
-  // con.query(`DROP TABLE IF EXISTS ${process.env.PASSWORD_TABLE_NAME}`);
-  // con.query(`DROP TABLE IF EXISTS ${process.env.LOGIN_TABLE_NAME}`);
-  con.query(`CREATE TABLE IF NOT EXISTS ${process.env.LOGIN_TABLE_NAME} (UserID int, Username varchar(20) UNIQUE, Password varchar(20), PRIMARY KEY (UserID))`);
-  con.query(`CREATE TABLE IF NOT EXISTS ${process.env.PASSWORD_TABLE_NAME} (UserID int, Site varchar(2000), Username varchar(255), Password varchar(255), FOREIGN KEY (UserID) REFERENCES ${process.env.LOGIN_TABLE_NAME}(UserID))`);
-  con.query(`INSERT IGNORE INTO ${process.env.LOGIN_TABLE_NAME} VALUES (1, 'test', 'admin123')`); // Inject sample user
+  con.query(`CREATE TABLE IF NOT EXISTS ${process.env.LOGIN_TABLE_NAME} (UserID int, Username varchar(256) UNIQUE, Password varchar(256), PRIMARY KEY (UserID))`);
+  con.query(`CREATE TABLE IF NOT EXISTS ${process.env.PASSWORD_TABLE_NAME} (UserID int, Site varchar(2000), Username varchar(2000), Password varchar(256), FOREIGN KEY (UserID) REFERENCES ${process.env.LOGIN_TABLE_NAME}(UserID))`);
+  con.query(`INSERT IGNORE INTO ${process.env.LOGIN_TABLE_NAME} VALUES (1, SHA2('test', 256), SHA2('admin123', 256))`); // Inject sample user
 });
 
 module.exports = {

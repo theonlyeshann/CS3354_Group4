@@ -1,17 +1,19 @@
 // Load environment variables
 const { loadEnvFile } = require('node:process');
+const crypto = require('crypto');
 loadEnvFile('./keysync/server/.env');
 
 db = require('./database.js');
 
 function loginUser(req, res) {
-  user = req.body.username;
-  pw = req.body.password;
+  const user = crypto.createHash('sha256').update(req.body.username).digest('hex');
+  const pw = crypto.createHash('sha256').update(req.body.password).digest('hex');
 
   db.pool.getConnection(function(err, con) {
     if (err) throw err;
     con.query(`SELECT UserID, Username, Password FROM ${process.env.LOGIN_TABLE_NAME} WHERE Username = '${user}'`, (err, results) => {
       if (err)  {
+        console.log(err);
         res.status(500).send(`Error encountered whilst looking for user: ${err}`);
       }
       else if (results.length == 0) {
