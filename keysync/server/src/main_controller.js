@@ -3,90 +3,89 @@ const { loadEnvFile } = require('node:process');
 const crypto = require('crypto');
 loadEnvFile('./keysync/server/.env');
 
-db = require('./database.js');
+const { initializePool } = require('./database.js');
 
-function retrievePasswords(req, res) {  
-  db.pool.getConnection(function(err, con) {
-    if (err) throw err;
-    con.query(`SELECT Site, Username, Password FROM ${process.env.PASSWORD_TABLE_NAME} WHERE UserID = ${req.session.userId}`, (err, results) => {
-    if (err)  {
-      res.status(500).send(`Error encountered whilst querying database: ${err}`);
-    }
-    else  {
-      res.status(200).json(results);
-    }
-    });
-    con.release();
-  });
+async function retrievePasswords(req, res) {  
+  const pool = await initializePool();
+
+  const con = await pool.getConnection();
+
+  try {
+    const [results] = await con.query(`SELECT Site, Username, Password FROM ${process.env.PASSWORD_TABLE_NAME} WHERE UserID = ${req.session.userId}`);
+    res.status(200).json(results);
+  }
+  catch (err) {
+    res.status(500).send(`Error encountered whilst querying database: ${err}`);
+  }
+  await con.release();
 }
 
-function addPassword(req, res) {  
-  let site = req.body.site;
-  let user = req.body.username;
-  let pw = crypto.createHash('sha256').update(req.body.password).digest('hex');
+async function addPassword(req, res) {  
+  const site = req.body.site;
+  const user = req.body.username;
+  const pw = crypto.createHash('sha256').update(req.body.password).digest('hex');
 
-  db.pool.getConnection(function(err, con) {
-    if (err) throw err;
-    con.query(`INSERT INTO ${process.env.PASSWORD_TABLE_NAME} VALUES (${req.session.userId}, '${site}', '${user}', '${pw}')`, (err, results) => {
-    if (err)  {
-      res.status(500).send(`Error encountered whilst adding user: ${err}`);
-    }
-    else  {
-      res.status(200).send("Successfully added password");
-    }
-    });
-    con.release();
-  });
+  const pool = await initializePool();
+
+  const con = await pool.getConnection();
+
+  try {
+    const [results] = await con.query(`INSERT INTO ${process.env.PASSWORD_TABLE_NAME} VALUES (${req.session.userId}, '${site}', '${user}', '${pw}')`);
+    res.status(200).send("Successfully added password");
+  }
+  catch (err) {
+    res.status(500).send(`Error encountered whilst adding user: ${err}`);
+  }
+  await con.release();
 }
 
-function editPassword(req, res) {  
-  let site = req.body.site;
-  let user = req.body.username;
-  let pw = crypto.createHash('sha256').update(req.body.password).digest('hex');
+async function editPassword(req, res) {  
+  const site = req.body.site;
+  const user = req.body.username;
+  const pw = crypto.createHash('sha256').update(req.body.password).digest('hex');
 
-  db.pool.getConnection(function(err, con) {
-    if (err) throw err;
-    con.query(`UPDATE ${process.env.PASSWORD_TABLE_NAME} SET Username = '${user}', Password = '${pw}' WHERE UserID = ${req.session.userId} AND Site = '${site}'`, (err, results) => {
-    if (err)  {
-      res.status(500).send(`Error encountered whilst editing user: ${err}`);
-    }
-    else  {
-      res.status(200).send("Successfully edited password");
-    }
-    });
-    con.release();
-  });
+  const pool = await initializePool();
+
+  const con = await pool.getConnection();
+
+  try {
+    const [results] = await con.query(`UPDATE ${process.env.PASSWORD_TABLE_NAME} SET Username = '${user}', Password = '${pw}' WHERE UserID = ${req.session.userId} AND Site = '${site}'`);
+    res.status(200).send("Successfully edited password");
+  }
+  catch (err) {
+    res.status(500).send(`Error encountered whilst editing user: ${err}`);
+  }
+  await con.release();
 }
 
-function deletePassword(req, res) {  
-  let site = req.body.site;
-  let user = req.body.username;
-  let pw = req.body.password.length == 64? req.body.password : crypto.createHash('sha256').update(req.body.password).digest('hex');
+async function deletePassword(req, res) {  
+  const site = req.body.site;
+  const user = req.body.username;
+  const pw = req.body.password.length == 64? req.body.password : crypto.createHash('sha256').update(req.body.password).digest('hex');
 
-  db.pool.getConnection(function(err, con) {
-    if (err) throw err;
-    con.query(`DELETE FROM ${process.env.PASSWORD_TABLE_NAME} WHERE Site='${site}' AND Username='${user}' AND Password='${pw}'`, (err, results) => {
-    if (err)  {
-      res.status(500).send(`Error encountered whilst deleting user: ${err}`);
-    }
-    else  {
-      res.status(200).send("Successfully deleted password");
-    }
-    });
-    con.release();
-  });
+  const pool = await initializePool();
+
+  const con = await pool.getConnection();
+
+  try {
+    const [results] = await con.query(`DELETE FROM ${process.env.PASSWORD_TABLE_NAME} WHERE Site='${site}' AND Username='${user}' AND Password='${pw}'`);
+    res.status(200).send("Successfully deleted password");
+  }
+  catch (err) {
+    res.status(500).send(`Error encountered whilst deleting user: ${err}`);
+  }
+  await con.release();
 }
 
-function logOut(req, res) {  
-  req.session.destroy((err) =>  {
-    if (err)  {
-      res.status(500).send(`Error encountered whilst logging out: ${err}`);
-    }
-    else  {
-      res.clearCookie('connect.sid');
-      res.status(200).send("Successfully logged out");
-    }
-  });
+async function logOut(req, res) {  
+  try {
+    req.session.destroy();
+    res.clearCookie('connect.sid');
+    res.status(200).send("Successfully logged out");
+  }
+  catch (err) {
+    res.status(500).send(`Error encountered whilst logging out: ${err}`);
+  }
 }
 
 module.exports = {
