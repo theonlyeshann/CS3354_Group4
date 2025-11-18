@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import LoginPage from './pages/loginpage.jsx'
+import LoginPage from './pages/createacc.jsx'
 import Dashboard from './pages/dashboard.jsx'
 import './index.css'
 
