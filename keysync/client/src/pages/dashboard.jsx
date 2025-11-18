@@ -37,7 +37,6 @@ export default function Dashboard() {
       
       if (response.status == 200) {
         let existingPasswords = await response.json();
-        console.log(`Existing passwords - ${existingPasswords}`);
         const formattedExistingPasswords = existingPasswords.map((password) =>  ({
           id: uuidv4(),
           websiteName: password.Site,
@@ -57,10 +56,6 @@ export default function Dashboard() {
   useEffect(() => {
     retrievePasswordsFromDatabase();
   }, []);
-
-  useEffect(() => {
-    console.log(passwords);
-  }, [passwords]);
 
   const handleLogout = () => {
     // Redirect to login page
