@@ -63,6 +63,11 @@ export default function LoginPage() {
     }
   };
 
+  const handleCreateAcc = async () =>
+  {
+    window.location.href = '/createacc'
+  }
+
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
       handleLogin();
@@ -255,6 +260,17 @@ export default function LoginPage() {
           {loading ? 'Logging in...' : 'Login'}
         </button>
 
+        <button 
+        style={{
+            ...styles.button,
+            ...(loading ? styles.buttonDisabled : {}),
+            ...(buttonHovered && !loading ? styles.buttonHover : {})
+          }}
+          onClick={handleCreateAcc}
+        >
+          Create Account
+        </button>
+
         <div style={styles.infoBox}>
           <span style={styles.infoTitle}>📝 How this works:</span>
           • Frontend collects username & password<br/>
@@ -263,6 +279,7 @@ export default function LoginPage() {
           • Backend sends success/error response<br/>
           • Frontend displays the result
         </div>
+
       </div>
     </div>
   );

@@ -72,16 +72,12 @@ export default function Dashboard() {
         {/* Create Account */}
         <div className="createacc-section">
         <h2>Create Account</h2>
-        <input type="text" placeholder="Email" className="email-input" />
         <input type="text" placeholder="Username" className="username-input" />
         <input type="text" placeholder="Password" className="pw-input" />
         <input type="text" placeholder="Confirm Password" className="pw-input" />
+        <button className="createacc-btn" onClick={handleSignIn}>Create Account</button>
         </div>
 
-        {/* Notifications Section */}
-        <div className="pwreqs-section">
-        <h2>Password Requirements</h2>
-        </div>
       </div>
 
       
