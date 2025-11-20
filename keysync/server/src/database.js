@@ -4,12 +4,6 @@ loadEnvFile('./keysync/server/.env');
 
 const mysql = require('mysql2/promise');
 
-// const connection = mysql.createConnection({
-//   host: process.env.HOST,
-//   user: process.env.USER,
-//   password: process.env.PASSWORD
-// });
-
 let pool;
 
 async function initializePool() {
@@ -21,6 +15,7 @@ async function initializePool() {
     password: process.env.PASSWORD
   });
 
+  await initConnection.query(`DROP DATABASE IF EXISTS ${process.env.DB_NAME}`);
   await initConnection.query(`CREATE DATABASE IF NOT EXISTS ${process.env.DB_NAME}`);
 
   await initConnection.end();
@@ -33,16 +28,16 @@ async function initializePool() {
     connectionLimit: 3
   });
 
-  pool.getConnection(function(err, con) {
-    if (err) throw err;
-    console.log("Successfully connected to DB");
-    con.query(`CREATE DATABASE IF NOT EXISTS ${process.env.DB_NAME}`);
-    con.query(`USE ${process.env.DB_NAME}`);
-    con.query(`DROP TABLE IF EXISTS ${process.env.PASSWORD_TABLE_NAME}`);
-    con.query(`CREATE TABLE IF NOT EXISTS ${process.env.LOGIN_TABLE_NAME} (UserID int, Username varchar(256) UNIQUE, Password varchar(256), PRIMARY KEY (UserID))`);
-    con.query(`CREATE TABLE IF NOT EXISTS ${process.env.PASSWORD_TABLE_NAME} (UserID int, Site varchar(2000), Username varchar(2000), Password varchar(256), FOREIGN KEY (UserID) REFERENCES ${process.env.LOGIN_TABLE_NAME}(UserID))`);
-    con.query(`INSERT IGNORE INTO ${process.env.LOGIN_TABLE_NAME} VALUES (1, SHA2('test', 256), SHA2('admin123', 256))`); // Inject sample user
-  });
+  try {
+    const con = await pool.getConnection();
+    await con.query(`CREATE DATABASE IF NOT EXISTS ${process.env.DB_NAME}`);
+    await con.query(`USE ${process.env.DB_NAME}`);
+    await con.query(`CREATE TABLE IF NOT EXISTS ${process.env.LOGIN_TABLE_NAME} (UserID varchar(40), Username varchar(256) UNIQUE, Password varbinary(256), PRIMARY KEY (UserID))`);
+    await con.query(`CREATE TABLE IF NOT EXISTS ${process.env.PASSWORD_TABLE_NAME} (UserID varchar(40), Site varchar(2000), Username varchar(2000), Password varbinary(256), FOREIGN KEY (UserID) REFERENCES ${process.env.LOGIN_TABLE_NAME}(UserID))`);
+  }
+  catch {
+    throw err;
+  }
 
   return pool;
 }

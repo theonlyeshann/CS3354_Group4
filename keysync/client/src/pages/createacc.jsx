@@ -1,25 +1,44 @@
 import { useState } from 'react';
-import '../styles/loginpage.css';
+import '../styles/createacc.css';
 
-export default function LoginPage() {
+export default function Dashboard() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState('');
+  const [isError] = useState(false);
 
-  const handleLogin = async () => {
-    if (!username || !password) {
+
+  const handleSignIn = () => {
+    // Redirect to main page
+    window.location.href = '/login';
+  };
+
+  const handleCreateAcc = async () =>
+  {
+    setLoading(true);
+    setMessage('');
+    
+    //  If any field is empty
+    if (!username || !password || !confirmPassword)
+    {
       setMessage('Please fill in all fields');
       setMessageType('error');
       return;
     }
+    //  If Password != Confirm Password
+    else if (password != confirmPassword)
+    {
+      setMessage('Passwords do not match');
+      setMessageType('error');
+      return;
+    }
 
-    setLoading(true);
-    setMessage('');
-
-    try {
-      const response = await fetch('http://localhost:8080/login', {
+    try
+    {
+      const response = await fetch('http://localhost:8080/login/new', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -34,43 +53,38 @@ export default function LoginPage() {
       const data = await response;
 
       if (response.status == 200) {
-        window.location.href = '/main'
+        window.location.href = '/main';
         setMessage(data.message || 'Login successful!');
         setMessageType('success');
+        
         
         if (data.token) {
           console.log('Auth token received:', data.token);
         }
       }
-      else if (response.status == 400)  {
-        setMessage(data.message || 'Incorrect password');
+
+      else if (response.status == 409)  {
+        setMessage('Account with that username already exists');
         setMessageType('error');
       }
-      else if (response.status == 404)  {
-        setMessage(data.message || 'Account does not exist');
-        setMessageType('error');
-      }
-      else {
-        setMessage(data.message || 'Login failed');
-        setMessageType('error');
-      }
-    } catch (error) {
+    }
+    catch (error)
+    { 
       setMessage('Cannot connect to server. Please try again.');
       setMessageType('error');
-      console.error('Login error:', error);
-    } finally {
-      setLoading(false);
+      console.error('Account creation error:', error);
     }
-  };
+    finally
+    {
+      setLoading(false);
 
-  const handleCreateAcc = async () =>
-  {
-    window.location.href = '/register'
-  }
+    }
+
+  };
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
-      handleLogin();
+      handleCreateAcc();
     }
   };
 
@@ -189,53 +203,56 @@ export default function LoginPage() {
     }
   };
 
-  const [usernameFocused, setUsernameFocused] = useState(false);
-  const [passwordFocused, setPasswordFocused] = useState(false);
-  const [buttonHovered, setButtonHovered] = useState(false);
-
- return (
-  <div className="lp-container">
-    <div className="lp-card">
-      <div style={styles.header}>
-          <div style={styles.icon}>🔐</div>
-          <h1 style={styles.title}>Welcome to KeySync!</h1>
+  return (
+    <div className="dashboard-container">
+      {/* Header */}
+      <header className="dashboard-header">
+        <div className="header-left">
+          <button className="signin-btn" onClick={handleSignIn}>Sign In</button>
         </div>
-
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>Username</label>
-          <input
-            type="text"
-            style={{
-              ...styles.input,
-              ...(usernameFocused ? styles.inputFocus : {})
-            }}
-            placeholder="Enter your username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            onKeyPress={handleKeyPress}
-            onFocus={() => setUsernameFocused(true)}
-            onBlur={() => setUsernameFocused(false)}
-            disabled={loading}
-          />
+        
+        <div className="header-center">
+          <h1 className="app-title">KeySync</h1>
         </div>
-
-        <div style={styles.inputGroup}>
-          <label style={styles.label}>Password</label>
-          <input
-            type="password"
-            style={{
-              ...styles.input,
-              ...(passwordFocused ? styles.inputFocus : {})
-            }}
-            placeholder="Enter your password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            onKeyPress={handleKeyPress}
-            onFocus={() => setPasswordFocused(true)}
-            onBlur={() => setPasswordFocused(false)}
-            disabled={loading}
-          />
+        
+        <div className="header-right">
+          <div className="user-icon">🔐</div>
         </div>
+      </header>
+
+      {/* Main Content */}
+      <div className="dashboard-content">
+        
+        {/* Create Account */}
+        <div className="createacc-section">
+        <h2>Create Account</h2>
+
+        <input
+          type="text"
+          placeholder="Username"
+          className="username-input"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          onKeyPress={handleKeyPress}
+        />
+
+        <input 
+          type="password"
+          placeholder="Password"
+          className="pw-input" 
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          onKeyPress={handleKeyPress}
+        />
+
+        <input 
+          type="password"
+          placeholder="Confirm Password"
+          className="pw-input" 
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          onKeyPress={handleKeyPress}
+        />
 
         {message && (
           <div style={{
@@ -245,42 +262,13 @@ export default function LoginPage() {
             {message}
           </div>
         )}
+        <button className="createacc-btn" onClick={handleCreateAcc}disabled={loading}>Create Account</button>
 
-        <button
-          style={{
-            ...styles.button,
-            ...(loading ? styles.buttonDisabled : {}),
-            ...(buttonHovered && !loading ? styles.buttonHover : {})
-          }}
-          onClick={handleLogin}
-          onMouseEnter={() => setButtonHovered(true)}
-          onMouseLeave={() => setButtonHovered(false)}
-          disabled={loading}
-        >
-          {loading ? 'Logging in...' : 'Login'}
-        </button>
-
-        <button 
-        style={{
-            ...styles.button,
-            ...(loading ? styles.buttonDisabled : {}),
-            ...(buttonHovered && !loading ? styles.buttonHover : {})
-          }}
-          onClick={handleCreateAcc}
-        >
-          Create Account
-        </button>
-
-        <div style={styles.infoBox}>
-          <span style={styles.infoTitle}>📝 How this works:</span>
-          • Frontend collects username & password<br/>
-          • Sends POST request to backend API<br/>
-          • Backend validates & checks database<br/>
-          • Backend sends success/error response<br/>
-          • Frontend displays the result
         </div>
 
       </div>
+
+      
     </div>
   );
 }

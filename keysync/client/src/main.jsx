@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import LoginPage from './pages/loginpage.jsx'
 import Dashboard from './pages/dashboard.jsx'
+import CreateAccPage from './pages/createacc.jsx'
 import './index.css'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
@@ -12,6 +13,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         {/* Route for the Login Page */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/main" element={<Dashboard />} />
+        <Route path="/register" element={<CreateAccPage />} />
         <Route path="/" element={<LoginPage />} /> 
       </Routes>
     </Router>

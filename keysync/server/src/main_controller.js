@@ -4,6 +4,7 @@ const crypto = require('crypto');
 loadEnvFile('./keysync/server/.env');
 
 const { initializePool } = require('./database.js');
+const secretKey = crypto.randomBytes(32);
 
 async function retrievePasswords(req, res) {  
   const pool = await initializePool();
@@ -11,7 +12,7 @@ async function retrievePasswords(req, res) {
   const con = await pool.getConnection();
 
   try {
-    const [results] = await con.query(`SELECT Site, Username, Password FROM ${process.env.PASSWORD_TABLE_NAME} WHERE UserID = ${req.session.userId}`);
+    const [results] = await con.query(`SELECT Site, Username, CAST(AES_DECRYPT(Password, '${secretKey}') AS CHAR) AS Password FROM ${process.env.PASSWORD_TABLE_NAME} WHERE UserID = '${req.session.userId}'`);
     res.status(200).json(results);
   }
   catch (err) {
@@ -23,14 +24,14 @@ async function retrievePasswords(req, res) {
 async function addPassword(req, res) {  
   const site = req.body.site;
   const user = req.body.username;
-  const pw = crypto.createHash('sha256').update(req.body.password).digest('hex');
+  const pw = req.body.password;
 
   const pool = await initializePool();
 
   const con = await pool.getConnection();
 
   try {
-    const [results] = await con.query(`INSERT INTO ${process.env.PASSWORD_TABLE_NAME} VALUES (${req.session.userId}, '${site}', '${user}', '${pw}')`);
+    await con.query(`INSERT INTO ${process.env.PASSWORD_TABLE_NAME} VALUES ('${req.session.userId}', '${site}', '${user}', AES_ENCRYPT('${pw}', '${secretKey}'))`);
     res.status(200).send("Successfully added password");
   }
   catch (err) {
@@ -42,14 +43,14 @@ async function addPassword(req, res) {
 async function editPassword(req, res) {  
   const site = req.body.site;
   const user = req.body.username;
-  const pw = crypto.createHash('sha256').update(req.body.password).digest('hex');
+  const pw = req.body.password;
 
   const pool = await initializePool();
 
   const con = await pool.getConnection();
 
   try {
-    const [results] = await con.query(`UPDATE ${process.env.PASSWORD_TABLE_NAME} SET Username = '${user}', Password = '${pw}' WHERE UserID = ${req.session.userId} AND Site = '${site}'`);
+    await con.query(`UPDATE ${process.env.PASSWORD_TABLE_NAME} SET Username = '${user}', Password = AES_ENCRYPT('${pw}', '${secretKey}') WHERE UserID = '${req.session.userId}' AND Site = '${site}'`);
     res.status(200).send("Successfully edited password");
   }
   catch (err) {
@@ -61,14 +62,14 @@ async function editPassword(req, res) {
 async function deletePassword(req, res) {  
   const site = req.body.site;
   const user = req.body.username;
-  const pw = req.body.password.length == 64? req.body.password : crypto.createHash('sha256').update(req.body.password).digest('hex');
+  const pw = req.body.password;
 
   const pool = await initializePool();
 
   const con = await pool.getConnection();
 
   try {
-    const [results] = await con.query(`DELETE FROM ${process.env.PASSWORD_TABLE_NAME} WHERE Site='${site}' AND Username='${user}' AND Password='${pw}'`);
+    await con.query(`DELETE FROM ${process.env.PASSWORD_TABLE_NAME} WHERE Site='${site}' AND Username='${user}' AND Password=AES_ENCRYPT('${pw}', '${secretKey}')`);
     res.status(200).send("Successfully deleted password");
   }
   catch (err) {
