@@ -20,6 +20,7 @@ export default function Dashboard() {
   {
     setLoading(true);
     setMessage('');
+    console.log(username, password, confirmPassword);
     
     //  If any field is empty
     if (!username || !password || !confirmPassword)
