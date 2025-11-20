@@ -29,7 +29,7 @@ export default function Dashboard() {
       return;
     }
     //  If Password != Confirm Password
-    else if (password != confirmPassword)
+    if (password != confirmPassword)
     {
       setMessage('Passwords do not match');
       setMessageType('error');
@@ -262,7 +262,7 @@ export default function Dashboard() {
             {message}
           </div>
         )}
-        <button className="createacc-btn" onClick={handleCreateAcc}disabled={loading}>Create Account</button>
+        <button className="createacc-btn" onClick={handleCreateAcc}>Create Account</button>
 
         </div>
 
