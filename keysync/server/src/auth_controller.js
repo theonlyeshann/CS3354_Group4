@@ -27,11 +27,30 @@ async function loginUser(req, res) {
     }
   }
   catch (err) {
-    throw err;
+    res.status(500).send(`Error encountered whilst logging in: ${err}`);
+  }
+  await con.release();
+}
+
+async function createAccount(req, res) {
+  const user = crypto.createHash('sha256').update(req.body.username).digest('hex');
+  const pw = crypto.createHash('sha256').update(req.body.password).digest('hex');
+
+  const pool = await initializePool();
+
+  const con = await pool.getConnection();
+
+  try {
+    await con.query(`INSERT INTO ${process.env.LOGIN_TABLE_NAME} VALUES ('${crypto.randomUUID()}', '${user}', '${pw}')`);
+    res.status(200).send("Successfully created account");
+  }
+  catch (err) {
+    res.status(500).send(`Error encountered whilst creating account: ${err}`);
   }
   await con.release();
 }
 
 module.exports = {
-  loginUser
+  loginUser,
+  createAccount
 }

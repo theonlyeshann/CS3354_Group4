@@ -3,6 +3,7 @@ const router = express.Router();
 auth_controller = require('./auth_controller.js');
 
 router.post('/', auth_controller.loginUser);
+router.post('/new', auth_controller.createAccount);
 
 module.exports = {
   router
