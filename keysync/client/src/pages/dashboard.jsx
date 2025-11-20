@@ -11,6 +11,8 @@ export default function Dashboard() {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [selectedPassword, setSelectedPassword] = useState(null);
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   
   const [newPassword, setNewPassword] = useState({
     websiteUrl: '',
@@ -52,6 +54,37 @@ export default function Dashboard() {
       console.error('Error:', error);
     }
   }
+
+   const generatePassword = (length = 16) => {
+    const charset =
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZ" +
+      "abcdefghijklmnopqrstuvwxyz" +
+      "0123456789" +
+      "!@#$%^&*()_+{}[]<>?/|";
+
+    const randomValues = new Uint32Array(length);
+    window.crypto.getRandomValues(randomValues);
+
+    return Array.from(randomValues, (val) => charset[val % charset.length]).join("");
+  };
+
+  const handleGenerate = () => {
+    const newPass = generatePassword(16);
+        console.log('yo')
+    setNewPassword({ ...newPassword, password: newPass });
+  };
+
+  const handleCopyPassword = async () => {
+  if (!newPassword.password) return; // nothing to copy
+
+  try {
+    await navigator.clipboard.writeText(newPassword.password);
+    // optional: show a toast / alert / message
+    console.log("Password copied to clipboard");
+  } catch (err) {
+    console.error("Failed to copy password:", err);
+  }
+};
 
   useEffect(() => {
     retrievePasswordsFromDatabase();
@@ -275,14 +308,31 @@ export default function Dashboard() {
               onChange={(e) => setNewPassword({ ...newPassword, username: e.target.value })}
               className="modal-input"
             />
-            <input
-              type="password"
-              placeholder="Password"
-              value={newPassword.password}
-              onChange={(e) => setNewPassword({ ...newPassword, password: e.target.value })}
-              className="modal-input"
-            />
+            <div className='password-input-container'>
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="Password"
+                value={newPassword.password}
+                onChange={(e) => setNewPassword({ ...newPassword, password: e.target.value })}
+                className="modal-input password-input"
+              />
+              <button
+                type="button"
+                className="icon-btn input-icon"
+                onClick={() => setShowPassword(prev => !prev)}
+              >
+                {showPassword ? "/👁" :  "👁"}
+              </button>
+              <button
+                type="button"
+                className="icon-btn input-icon copy-icon"
+                onClick={handleCopyPassword}
+              >
+                ⧉
+              </button>
+            </div>
             <div className="modal-actions">
+              <button className='modal-btn cancel' onClick={handleGenerate}>Generate Password</button>
               <button className="modal-btn cancel" onClick={() => setShowAddModal(false)}>Cancel</button>
               <button className="modal-btn save" onClick={handleAddPassword}>Add Password</button>
             </div>
