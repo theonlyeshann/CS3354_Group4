@@ -25,7 +25,6 @@ async function addPassword(req, res) {
   const site = req.body.site;
   const user = req.body.username;
   const pw = req.body.password;
-  console.log(`${site}, ${user}, ${pw}`);
 
   const pool = await initializePool();
 

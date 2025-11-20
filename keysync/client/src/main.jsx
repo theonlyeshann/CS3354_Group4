@@ -13,7 +13,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
         {/* Route for the Login Page */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/main" element={<Dashboard />} />
-        <Route path="/createacc" element={<CreateAccPage />} />
+        <Route path="/register" element={<CreateAccPage />} />
         <Route path="/" element={<LoginPage />} /> 
       </Routes>
     </Router>

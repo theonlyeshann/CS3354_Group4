@@ -33,6 +33,7 @@ async function loginUser(req, res) {
 }
 
 async function createAccount(req, res) {
+  const userId = crypto.randomUUID();
   const user = crypto.createHash('sha256').update(req.body.username).digest('hex');
   const pw = crypto.createHash('sha256').update(req.body.password).digest('hex');
 
@@ -41,11 +42,17 @@ async function createAccount(req, res) {
   const con = await pool.getConnection();
 
   try {
-    await con.query(`INSERT INTO ${process.env.LOGIN_TABLE_NAME} VALUES ('${crypto.randomUUID()}', '${user}', '${pw}')`);
+    await con.query(`INSERT INTO ${process.env.LOGIN_TABLE_NAME} VALUES ('${userId}', '${user}', '${pw}')`);
+    req.session.userId = userId;
     res.status(200).send("Successfully created account");
   }
   catch (err) {
-    res.status(500).send(`Error encountered whilst creating account: ${err}`);
+    if (err.message.includes("Duplicate entry"))  {
+      res.status(409).send("Account with that username already exists");
+    }
+    else  {
+      res.status(500).send(`Error encountered whilst creating account: ${err}`);
+    }
   }
   await con.release();
 }

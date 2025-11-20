@@ -65,7 +65,7 @@ export default function LoginPage() {
 
   const handleCreateAcc = async () =>
   {
-    window.location.href = '/createacc'
+    window.location.href = '/register'
   }
 
   const handleKeyPress = (e) => {
