@@ -3,50 +3,62 @@ import { v4 as uuidv4 } from 'uuid';
 import '../styles/createacc.css';
 
 export default function Dashboard() {
-  const [passwords, setPasswords] = useState([
-  ]);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState('');
+  const [isError] = useState(false);
 
-  const retrievePasswordsFromDatabase = async() =>  {
-    try {      
-      setPasswords([...[]]);
-      const response = await fetch('http://localhost:8080/main/', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include'
-      });
-      
-      if (response.status == 200) {
-        let existingPasswords = await response.json();
-        console.log(`Existing passwords - ${existingPasswords}`);
-        const formattedExistingPasswords = existingPasswords.map((password) =>  ({
-          id: uuidv4(),
-          websiteName: password.Site,
-          username: password.Username,
-          password: password.Password,
-          lastChanged: new Date().toLocaleDateString('en-US'),
-          status: 'Secure'
-        }));
-        setPasswords([...formattedExistingPasswords]);
-      }
-
-    } catch (error) {
-      console.error('Error:', error);
-    }
-  }
-
-  useEffect(() => {
-    retrievePasswordsFromDatabase();
-  }, []);
-
-  useEffect(() => {
-    console.log(passwords);
-  }, [passwords]);
 
   const handleSignIn = () => {
     // Redirect to login page
-    window.location.href = '/';
+    window.location.href = '/login';
+  };
+
+  const handleCreateAcc = async () =>
+  {
+    setLoading(true);
+    setMessage('');
+    
+    //  If any field is empty
+    if (!username || !password || !confirmPassword)
+    {
+      setMessage('Please fill in all fields');
+      setMessageType('error');
+      return;
+    }
+    //  If Password != Confirm Password
+    else if (password != confirmPassword)
+    {
+      setMessage('Passwords do not match');
+      setMessageType('error');
+      return;
+    }
+
+    try
+    {
+      //  User account creation code here
+    }
+    catch (error)
+    { 
+      setMessage('Cannot connect to server. Please try again.');
+      setMessageType('error');
+      console.error('Login error:', error);
+    }
+    finally
+    {
+      setLoading(false);
+      window.location.href = '/login';
+    }
+
+  };
+
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      handleCreateAcc();
+    }
   };
 
   return (
@@ -72,16 +84,41 @@ export default function Dashboard() {
         {/* Create Account */}
         <div className="createacc-section">
         <h2>Create Account</h2>
-        <input type="text" placeholder="Email" className="email-input" />
-        <input type="text" placeholder="Username" className="username-input" />
-        <input type="text" placeholder="Password" className="pw-input" />
-        <input type="text" placeholder="Confirm Password" className="pw-input" />
+
+        <input
+          type="text"
+          placeholder="Username"
+          className="username-input"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          onKeyPress={handleKeyPress}
+        />
+
+        <input 
+          type="password"
+          placeholder="Password"
+          className="pw-input" 
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          onKeyPress={handleKeyPress}
+        />
+
+        <input 
+          type="password"
+          placeholder="Confirm Password"
+          className="pw-input" 
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          onKeyPress={handleKeyPress}
+        />
+
+        <div className='msg-content'>
+          {message}
+        </div>
+        <button className="createacc-btn" onClick={handleCreateAcc}>Create Account</button>
+
         </div>
 
-        {/* Notifications Section */}
-        <div className="pwreqs-section">
-        <h2>Password Requirements</h2>
-        </div>
       </div>
 
       

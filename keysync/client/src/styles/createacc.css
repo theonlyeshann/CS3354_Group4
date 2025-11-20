@@ -90,8 +90,9 @@
   background-color: rgba(255, 255, 255, 0.15);
   border-radius: 20px;
   padding: 30px;
-  backdrop-filter: blur(10px);
   text-align: center;
+  max-width: 500px;
+  margin: 0 auto;
 }
 
 .createacc-section h2 {
@@ -101,7 +102,7 @@
   margin-bottom: 20px;
 }
 
-.email-input, .username-input, .pw-input {
+.username-input {
   width: 100%;
   padding: 15px;
   margin-bottom: 15px;
@@ -111,20 +112,45 @@
   outline: none;
 }
 
-/* Password Requirements Section */
-.pwreqs-section {
-  background-color: rgba(255, 255, 255, 0.15);
-  border-radius: 20px;
-  padding: 30px;
-  backdrop-filter: blur(10px);
-  flex: 1;
-  min-height: 300px;
+.pw-input {
+  width: 100%;
+  padding: 15px;
+  margin-bottom: 15px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  outline: none;
 }
 
-.pwreqs-section h2 {
-  color: white;
-  font-size: 24px;
-  font-weight: bold;
+.msg-content {
+  color: #ff0019;
+  text-shadow: 0 0 2px #000000;
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-top: 16px;
+  font-size: 16px;
+  font-weight: 500;
+  width: 400px;
+  margin: 0 auto;
+}
+
+.createacc-btn {
+  background-color: white;
+  color: #333;
+  border: none;
+  padding: 20px 60px;
+  border-radius: 25px;
+  font-size: 32px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  width: 400px;
+  margin-top: 16px;
+}
+
+.createacc-btn:hover {
+  background-color: #f0f0f0;
+  transform: translateY(-2px);
 }
 
 /* Responsive Design */
