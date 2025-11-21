@@ -246,6 +246,7 @@
   gap: 10px;
 }
 
+.copy-btn,
 .delete-btn,
 .edit-btn {
   border: none;
@@ -258,6 +259,16 @@
   display: flex;
   align-items: center;
   gap: 5px;
+}
+
+.copy-btn {
+  background-color: rgb(234, 234, 234);
+  color: #181818;
+}
+
+.copy-btn:hover {
+  background-color: #3b3b3b;
+  color: white;
 }
 
 .delete-btn {

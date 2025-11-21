@@ -70,15 +70,12 @@ export default function Dashboard() {
 
   const handleGenerate = () => {
     const newPass = generatePassword(16);
-        console.log('yo')
     setNewPassword({ ...newPassword, password: newPass });
   };
 
-  const handleCopyPassword = async () => {
-  if (!newPassword.password) return; // nothing to copy
-
+  const handleCopyPassword = async (password) => {
   try {
-    await navigator.clipboard.writeText(newPassword.password);
+    await navigator.clipboard.writeText(password.password);
     // optional: show a toast / alert / message
     console.log("Password copied to clipboard");
   } catch (err) {
@@ -261,6 +258,12 @@ export default function Dashboard() {
                   </p>
                 </div>
                 <div className="password-actions">
+                  <button
+                    className="copy-btn"
+                    onClick={() => handleCopyPassword(password)}
+                  >
+                    ⧉ COPY
+                  </button>
                   <button className="delete-btn" onClick={() => handleDeletePassword(password.id)}>
                     🗑️ DELETE
                   </button>
@@ -322,13 +325,6 @@ export default function Dashboard() {
                 onClick={() => setShowPassword(prev => !prev)}
               >
                 {showPassword ? "/👁" :  "👁"}
-              </button>
-              <button
-                type="button"
-                className="icon-btn input-icon copy-icon"
-                onClick={handleCopyPassword}
-              >
-                ⧉
               </button>
             </div>
             <div className="modal-actions">
